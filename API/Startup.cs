@@ -13,6 +13,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using API.Data;
 using Microsoft.EntityFrameworkCore;
+using API.Interfaces;
+using API.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using API.Extensions;
 
 namespace API
 {
@@ -28,12 +34,10 @@ namespace API
       // This method gets called by the runtime. Use this method to add services to the container.
       public void ConfigureServices(IServiceCollection services)
       {
-         services.AddDbContext<DataContext>(options =>
-         {
-            options.UseSqlite(_config.GetConnectionString("DefaultConnection"));
-         });
+         services.AddApplicationServices(_config);
          services.AddControllers();
          services.AddCors();
+         services.AddIdentityServices(_config);
          services.AddSwaggerGen(c =>
          {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
@@ -54,6 +58,8 @@ namespace API
 
          app.UseRouting();
          app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200"));
+
+         app.UseAuthentication(); // must come before UseAuthorization
          app.UseAuthorization();
 
          app.UseEndpoints(endpoints =>
