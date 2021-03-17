@@ -19,6 +19,10 @@ import { RegisterComponent } from './register/register.component';
 import { ErrorInterceptor } from './_interceptors/error.interceptor';
 import { JwtInterceptor } from './_interceptors/jwt.interceptor';
 import { SharedModule } from './_modules/shared.module';
+import { MemberEditComponent } from './members/member-edit/member-edit.component';
+import { NgxSpinner } from 'ngx-spinner/lib/ngx-spinner.enum';
+import { LoadingInterceptor } from './_interceptors/loading.interceptor';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 
 @NgModule({
@@ -34,7 +38,8 @@ import { SharedModule } from './_modules/shared.module';
       TestErrorsComponent,
       NotFoundComponent,
       ServerErrorComponent,
-      MemberCardComponent
+      MemberCardComponent,
+      MemberEditComponent
    ],
    imports: [
       BrowserModule,
@@ -42,10 +47,12 @@ import { SharedModule } from './_modules/shared.module';
       HttpClientModule,
       BrowserAnimationsModule,
       FormsModule,
-      SharedModule
+      SharedModule,
+      NgxSpinnerModule
    ],
    providers: [
       { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+      { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
       { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
    ],
    bootstrap: [AppComponent]
