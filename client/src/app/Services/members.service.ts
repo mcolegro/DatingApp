@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { of, pipe } from 'rxjs';
+import { Observable, of, pipe } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Member } from '../models/member';
@@ -58,9 +58,9 @@ export class MembersService {
 
       // The normal get returns the body of the response for us.  Adding the observe means that we get the whole response back and have to parse the body ourselves
       return this.getPaginatedResult<Member[]>(this.baseUrl + 'users', params)
-      .pipe(map(response => {
-         this.memberCache.set(Object.values(userParams).join('-'), response);
-         return response;
+         .pipe(map(response => {
+            this.memberCache.set(Object.values(userParams).join('-'), response);
+            return response;
          }));
    }
 
@@ -91,7 +91,7 @@ export class MembersService {
       const member = [...this.memberCache.values()]
          .reduce((array, element) => array.concat(element.result), [])
          .find((member: Member) => member.username === username);
-      
+
       if (member) {
          return of(member);
       }
@@ -113,5 +113,15 @@ export class MembersService {
 
    deletePhoto(photoId: number) {
       return this.http.delete(this.baseUrl + 'users/delete-photo/' + photoId);
+   }
+
+   addLike(username: string) {
+      return this.http.post(this.baseUrl + 'likes/' + username, {});  // Empty object needed because this is a POST
+   }
+
+   getLikes(predicate: string, pageNumber, pageSize) {
+      let params = this.getPaginationHeaders(pageNumber, pageSize);
+      params = params.append('predicate', predicate);
+      return this.getPaginatedResult<Partial<Member[]>>(this.baseUrl + 'likes', params);
    }
 }
