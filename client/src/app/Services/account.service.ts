@@ -36,6 +36,11 @@ export class AccountService {
       )
    }
    setCurrentUser(user: User) {
+      user.roles = [];
+      const roles = this.getDecodedToken(user.token).role;
+      // if user is in a single role, convert to an array 
+      Array.isArray(roles) ? user.roles = roles : user.roles.push(roles);
+
       localStorage.setItem('user', JSON.stringify(user));
       this.currentUserSource.next(user);
    }
@@ -43,5 +48,10 @@ export class AccountService {
    logout() {
       localStorage.removeItem('user');
       this.currentUserSource.next(null);
+   }
+
+   getDecodedToken(token) {
+      // token is in 3 parts.  we're interested in the middle part which is [1] (0, 1, 2)
+      return JSON.parse(atob(token.split('.')[1]))
    }
 }
