@@ -66,11 +66,15 @@ namespace API
          app.UseAuthentication(); // must come before UseAuthorization
          app.UseAuthorization();
 
+         app.UseDefaultFiles();     // Use default files like index.html
+         app.UseStaticFiles();      // this is for other static files like the angular files
+
          app.UseEndpoints(endpoints =>
          {
             endpoints.MapControllers();
             endpoints.MapHub<PresenceHub>("hubs/presence");
             endpoints.MapHub<MessageHub>("hubs/message");
+            endpoints.MapFallbackToController("Index", "Fallback");
          });
       }
    }
